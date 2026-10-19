@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Wi-Fi via nmcli: menu no fzf (terminal) ou fuzzel (waybar/atalho).
+#   wifi          menu interativo
+#   wifi on|off   liga/desliga o rádio
+#   wifi status   conexão atual
+
+menu() { # $1 = prompt
+    if [[ -t 0 && -t 1 ]]; then fzf --prompt "$1 " --height 40% --reverse --no-sort
+    else fuzzel --dmenu --prompt "$1 " --width 50; fi
+}
+ask_password() {
+    if [[ -t 0 && -t 1 ]]; then read -rsp "Senha de $1: " pw; echo >&2; printf '%s' "$pw"
+    else fuzzel --dmenu --password --prompt-only "󰌾 $1: " --lines 0; fi
+}
+notify() { command -v notify-send >/dev/null && notify-send -a wifi "$@" || echo "$*"; }
+
+case "$1" in
+    on)     nmcli radio wifi on;  exit ;;
+    off)    nmcli radio wifi off; exit ;;
+    status) nmcli -f GENERAL.CONNECTION,IP4.ADDRESS dev show "$(nmcli -t -f DEVICE,TYPE dev | awk -F: '$2=="wifi"{print $1; exit}')"; exit ;;
+esac
+
+if [[ $(nmcli radio wifi) == disabled ]]; then
+    choice=$(printf '󰖩  Ligar Wi-Fi\n' | menu "󰖪 ") || exit
+    nmcli radio wifi on && notify "Wi-Fi ligado"
+    exit
+fi
+
+# -e no + SSID por último: ssids com ':' ficam inteiros no último campo
+list=$(nmcli -t -e no -f IN-USE,SIGNAL,SECURITY,SSID dev wifi list --rescan auto |
+    awk -F: '$4!="" && !seen[$4]++')
+
+entries=$(
+    printf '󰑐  Atualizar\n󰖪  Desligar Wi-Fi\n'
+    while IFS=: read -r inuse signal sec ssid; do
+        icons=(󰤟 󰤢 󰤥 󰤨); icon=${icons[$(( signal * 4 / 101 ))]}
+        lock=$([[ -n $sec && $sec != -- ]] && echo 󰌾 || echo " ")
+        mark=$([[ $inuse == '*' ]] && echo " ✓" || echo "")
+        printf '%s %s  %s%s\n' "$icon" "$lock" "$ssid" "$mark"
+    done <<< "$list"
+)
+
+choice=$(menu "󰖩 " <<< "$entries") || exit
+case "$choice" in
+    *Atualizar)       nmcli dev wifi rescan; exec "$0" ;;
+    *"Desligar Wi-Fi") nmcli radio wifi off && notify "Wi-Fi desligado"; exit ;;
+esac
+
+ssid=${choice:5}; ssid=${ssid% ✓}
+if [[ $choice == *" ✓" ]]; then
+    nmcli con down id "$ssid" && notify "Desconectado de $ssid"
+elif nmcli -t -f NAME con show | grep -Fxq "$ssid"; then
+    nmcli con up id "$ssid" >/dev/null && notify "Conectado a $ssid" || notify -u critical "Falha ao conectar em $ssid"
+else
+    sec=$(awk -F: -v s="$ssid" '$4==s{print $3; exit}' <<< "$list")
+    if [[ -n $sec && $sec != -- ]]; then
+        pw=$(ask_password "$ssid") || exit
+        nmcli dev wifi connect "$ssid" password "$pw" >/dev/null
+    else
+        nmcli dev wifi connect "$ssid" >/dev/null
+    fi && notify "Conectado a $ssid" || notify -u critical "Falha ao conectar em $ssid"
+fi

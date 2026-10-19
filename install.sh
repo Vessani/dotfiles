@@ -26,3 +26,7 @@ for d in "$DOTFILES"/config/*; do
 done
 
 link "$DOTFILES/wallpapers" "$HOME/Pictures/wallpapers"
+
+for f in "$DOTFILES"/bin/*; do
+    link "$f" "$HOME/.local/bin/$(basename "$f")"
+done

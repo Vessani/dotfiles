@@ -6,6 +6,10 @@ kitty
 waybar
 fuzzel
 networkmanager
+bluez
+bluez-utils
+fzf
+libnotify
 pipewire
 pipewire-pulse
 pipewire-alsa
