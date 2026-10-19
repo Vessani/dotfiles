@@ -51,6 +51,13 @@ local menu        = "fuzzel"
 hl.on("hyprland.start", function ()
     hl.exec_cmd("waybar")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
+    hl.exec_cmd("swaybg -m fill -i ~/Pictures/wallpapers/cyberpunk-grid.png")
+    hl.exec_cmd("swaync")
+    hl.exec_cmd("hypridle")
+    hl.exec_cmd("wl-paste --type text --watch cliphist store")
+    hl.exec_cmd("wl-paste --type image --watch cliphist store")
+    hl.exec_cmd("nm-applet --indicator")
+    hl.exec_cmd("blueman-applet")
 end)
 
 
@@ -96,8 +103,8 @@ hl.config({
         border_size = 2,
 
         col = {
-            active_border   = { colors = {"rgba(33ccffee)", "rgba(00ff99ee)"}, angle = 45 },
-            inactive_border = "rgba(595959aa)",
+            active_border   = { colors = {"rgba(5ef1ffee)", "rgba(ff5ef1ee)"}, angle = 45 },
+            inactive_border = "rgba(3c4048aa)",
         },
 
         -- Set to true to enable resizing windows by clicking and dragging on borders and gaps
@@ -126,8 +133,8 @@ hl.config({
 
         blur = {
             enabled   = true,
-            size      = 3,
-            passes    = 1,
+            size      = 6,
+            passes    = 3,
             vibrancy  = 0.1696,
         },
     },
@@ -264,10 +271,17 @@ local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + F", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
+
+-- Clipboard, bloqueio, notificações e screenshots
+hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu --prompt '󰅌  ' | cliphist decode | wl-copy"))
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"))
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client -t -sw"))
+hl.bind("Print",           hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | satty --filename - --early-exit --copy-command wl-copy --output-filename ~/Pictures/Screenshots/%Y-%m-%d_%H-%M-%S.png"))
+hl.bind("SHIFT + Print",   hl.dsp.exec_cmd("grim - | satty --filename - --early-exit --copy-command wl-copy --output-filename ~/Pictures/Screenshots/%Y-%m-%d_%H-%M-%S.png"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -342,6 +356,11 @@ hl.window_rule({
 
     no_focus = true,
 })
+
+-- Blur atrás da waybar, notificações e launcher
+hl.layer_rule({ name = "blur-waybar", match = { namespace = "^waybar$" }, blur = true, ignore_alpha = 0.1 })
+hl.layer_rule({ name = "blur-swaync", match = { namespace = "^swaync-.*" }, blur = true, ignore_alpha = 0.1 })
+hl.layer_rule({ name = "blur-fuzzel", match = { namespace = "^launcher$" }, blur = true, ignore_alpha = 0.1 })
 
 -- Layer rules also return a handle.
 -- local overlayLayerRule = hl.layer_rule({
