@@ -1,113 +1,124 @@
-/* Neon (cyberdream) */
-@define-color bg      rgba(22, 24, 26, 0.55);
-@define-color pill    rgba(30, 33, 36, 0.75);
-@define-color fg      #ffffff;
-@define-color muted   #7b8496;
-@define-color cyan    #5ef1ff;
-@define-color pink    #ff5ef1;
-@define-color purple  #bd5eff;
-@define-color green   #5eff6c;
-@define-color yellow  #f1ff5e;
-@define-color orange  #ffbd5e;
-@define-color red     #ff6e5e;
+/* Minimal (cyberdream) — um acento só, resto em tons de cinza */
+@define-color bg      rgba(16, 18, 20, 0.62);
+@define-color fg      #e6e8eb;
+@define-color muted   #5c6370;
+@define-color accent  #5ef1ff;
+@define-color warn    #ffbd5e;
+@define-color crit    #ff6e5e;
 
 * {
-    font-family: "JetBrainsMono Nerd Font", "Font Awesome 7 Free", sans-serif;
-    font-size: 13px;
-    font-weight: bold;
+    font-family: "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
     min-height: 0;
+    border: none;
+    border-radius: 0;
 }
 
 window#waybar {
     background: @bg;
     color: @fg;
-    border: 1px solid alpha(@cyan, 0.35);
-    border-radius: 12px;
+    border-radius: 10px;
 }
 
 tooltip {
-    background: rgba(22, 24, 26, 0.95);
-    border: 1px solid @pink;
-    border-radius: 10px;
+    background: rgba(16, 18, 20, 0.95);
+    border: 1px solid alpha(@fg, 0.08);
+    border-radius: 8px;
 }
 
+tooltip label {
+    color: @fg;
+}
+
+/* Esquerda */
 #custom-arch {
-    color: @cyan;
-    font-size: 17px;
-    padding: 0 12px 0 14px;
+    color: @accent;
+    font-size: 15px;
+    padding: 0 10px 0 14px;
 }
 
 #workspaces {
-    background: @pill;
-    border-radius: 10px;
-    margin: 4px 0;
     padding: 0 4px;
 }
 
 #workspaces button {
-    padding: 0 8px;
-    color: @muted;
+    min-width: 8px;
+    min-height: 8px;
+    padding: 0;
+    margin: 11px 3px;
     border-radius: 8px;
+    background: alpha(@fg, 0.18);
+    transition: all 200ms ease;
+}
+
+#workspaces button label {
+    font-size: 0;
+}
+
+#workspaces button.empty {
+    background: alpha(@fg, 0.08);
 }
 
 #workspaces button:hover {
-    background: alpha(@cyan, 0.15);
-    color: @cyan;
+    background: alpha(@fg, 0.45);
     box-shadow: none;
 }
 
 #workspaces button.active {
-    color: #000000;
-    background: linear-gradient(90deg, @cyan, @pink);
+    min-width: 22px;
+    background: @accent;
 }
 
-#window {
-    color: @muted;
-    padding: 0 12px;
+#workspaces button.urgent {
+    background: @crit;
 }
 
-#clock,
-#cpu,
-#memory,
+/* Centro */
+#clock {
+    color: @fg;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* Direita */
+#tray,
 #pulseaudio,
-#backlight,
+#bluetooth,
 #network,
 #battery,
-#tray,
 #custom-notification {
-    background: @pill;
-    border-radius: 10px;
-    margin: 4px 0;
-    padding: 0 12px;
+    color: alpha(@fg, 0.75);
+    padding: 0 8px;
 }
 
-#clock {
-    color: @cyan;
-    border: 1px solid alpha(@cyan, 0.5);
+#custom-notification {
+    padding-right: 14px;
 }
 
-#cpu        { color: @green; }
-#memory     { color: @purple; }
-#pulseaudio { color: @pink; }
-#backlight  { color: @yellow; }
-#network    { color: @cyan; }
-#battery    { color: @green; }
-
-#custom-notification {
-    color: @pink;
-    margin-right: 6px;
+#pulseaudio:hover,
+#bluetooth:hover,
+#network:hover,
+#battery:hover,
+#custom-notification:hover {
+    color: @fg;
 }
 
 #pulseaudio.muted,
+#bluetooth.off,
+#bluetooth.disabled,
 #network.disconnected {
     color: @muted;
 }
 
+#battery.charging {
+    color: @accent;
+}
+
 #battery.warning:not(.charging) {
-    color: @orange;
+    color: @warn;
 }
 
 #battery.critical:not(.charging) {
-    color: @red;
-    border: 1px solid @red;
+    color: @crit;
 }
