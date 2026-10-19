@@ -29,5 +29,8 @@ Logar no tty1 inicia o Hyprland automaticamente.
 | Super+1..0 | workspaces |
 | Teclas de volume/brilho | wpctl / brightnessctl |
 
-Na barra: clique no áudio abre o pavucontrol, clique na rede abre o nmtui,
-scroll no brilho ajusta o brilho.
+Na barra: clique no áudio abre o pavucontrol, clique na rede abre o `wifi`,
+clique no bluetooth abre o `bt` (clique direito liga/desliga).
+
+`wifi` e `bt` (em `bin/`) também funcionam no terminal, com fzf:
+`wifi`, `wifi on|off|status`, `bt`, `bt scan`, `bt on|off`.
