@@ -1,0 +1,21 @@
+# Explicit packages for this setup (pacman -S --needed - < <(grep -v '^#' packages.txt))
+hyprland
+hyprpolkitagent
+xdg-desktop-portal-hyprland
+kitty
+waybar
+fuzzel
+networkmanager
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+pavucontrol
+sof-firmware
+brightnessctl
+playerctl
+noto-fonts
+noto-fonts-emoji
+otf-font-awesome
+ttf-dejavu
+git
