@@ -3,7 +3,7 @@
 Arch Linux + Hyprland (Lenovo IdeaPad, AMD, RTL8822CE).
 
 ```
-config/   -> ~/.config/<nome>   (hypr, waybar, fuzzel, kitty)
+config/   -> ~/.config/<nome>   (hypr, waybar, fuzzel, kitty, starship.toml)
 home/     -> ~/<arquivo>        (.bash_profile, .bashrc)
 system/   -> arquivos de /etc, aplicados por setup-system.sh
 ```
