@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Trava/libera o touchpad no Hyprland. Começa travado (ver hyprland.lua).
+#   touchpad          alterna travado/liberado
+#   touchpad on|off   libera/trava
+#   touchpad status   mostra o estado atual
+
+DEVICE="elan06fa:00-04f3:31be-touchpad"
+STATE="${XDG_RUNTIME_DIR:-/tmp}/touchpad-on" # existe = liberado
+
+notify() { command -v notify-send >/dev/null && notify-send -a touchpad -h string:x-canonical-private-synchronous:touchpad "$@" || echo "$*"; }
+set_enabled() { hyprctl eval "hl.device({ name = '$DEVICE', enabled = $1 })" >/dev/null; }
+
+on()  { set_enabled true  && touch "$STATE" && notify "󰟸  Touchpad liberado"; }
+off() { set_enabled false && rm -f "$STATE" && notify "󰤳  Touchpad travado"; }
+
+case "$1" in
+    on)     on ;;
+    off)    off ;;
+    status) [[ -e $STATE ]] && echo "liberado" || echo "travado" ;;
+    "")     [[ -e $STATE ]] && off || on ;;
+    *)      echo "uso: touchpad [on|off|status]" >&2; exit 1 ;;
+esac

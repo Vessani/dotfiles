@@ -256,6 +256,13 @@ hl.device({
     sensitivity = -0.5,
 })
 
+-- Touchpad começa travado; SUPER + T (ou a tecla de touchpad) libera/trava. Ver ~/dotfiles/bin/touchpad
+hl.device({
+    name    = "elan06fa:00-04f3:31be-touchpad",
+    enabled = false,
+})
+os.remove((os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/touchpad-on")
+
 
 ---------------------
 ---- KEYBINDINGS ----
@@ -278,6 +285,8 @@ hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu --prompt '󰅌  ' | cliphist decode | wl-copy"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client -t -sw"))
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("touchpad"))
+hl.bind("XF86TouchpadToggle", hl.dsp.exec_cmd("touchpad"))
 hl.bind("Print",           hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | satty --filename - --early-exit --copy-command wl-copy --output-filename ~/Pictures/Screenshots/%Y-%m-%d_%H-%M-%S.png"))
 hl.bind("SHIFT + Print",   hl.dsp.exec_cmd("grim - | satty --filename - --early-exit --copy-command wl-copy --output-filename ~/Pictures/Screenshots/%Y-%m-%d_%H-%M-%S.png"))
 
