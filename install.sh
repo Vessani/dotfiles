@@ -24,3 +24,5 @@ done
 for d in "$DOTFILES"/config/*; do
     link "$d" "$HOME/.config/$(basename "$d")"
 done
+
+link "$DOTFILES/wallpapers" "$HOME/Pictures/wallpapers"
