@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Áudio via pactl/wpctl: menu no fzf (terminal) ou fuzzel (waybar/atalho).
+#   audio          menu interativo (saída/entrada padrão, mudo)
+#   audio vol N    volume da saída em N%
+#   audio mute     alterna mudo da saída
+#   audio mic      alterna mudo do microfone
+
+menu() { # $1 = prompt
+    if [[ -t 0 && -t 1 ]]; then fzf --prompt "$1 " --height 40% --reverse --no-sort
+    else fuzzel --dmenu --prompt "$1 " --width 60; fi
+}
+notify() { command -v notify-send >/dev/null && notify-send -a audio "$@" || echo "$*"; }
+devices() { # $1 = sinks|sources -> "nome<TAB>descrição", sem monitores
+    pactl list "$1" | awk -F': ' '/^\s*Name: /{n=$2} /^\s*Description: /{if (n !~ /\.monitor$/) print n "\t" $2}'
+}
+muted() { [[ $(pactl "get-$1-mute" "@DEFAULT_${1^^}@") == *yes ]]; }
+
+case "$1" in
+    vol)  wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ "${2:?uso: audio vol N}%"; exit ;;
+    mute) wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; exit ;;
+    mic)  wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle; exit ;;
+esac
+
+sink=$(pactl get-default-sink); source=$(pactl get-default-source)
+vol=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)
+
+entries=$(
+    muted sink   && echo "󰕾  Desmutar saída ($vol)"   || echo "󰖁  Mutar saída ($vol)"
+    muted source && echo "󰍬  Desmutar microfone"      || echo "󰍭  Mutar microfone"
+    devices sinks | while IFS=$'\t' read -r name desc; do
+        printf '󰓃  Saída: %s%s  [%s]\n' "$desc" "$([[ $name == "$sink" ]] && echo " ✓")" "$name"
+    done
+    devices sources | while IFS=$'\t' read -r name desc; do
+        printf '󰍬  Entrada: %s%s  [%s]\n' "$desc" "$([[ $name == "$source" ]] && echo " ✓")" "$name"
+    done
+)
+
+choice=$(menu "󰕾 " <<< "$entries") || exit
+name=${choice##*[}; name=${name%]}
+desc=${choice#*: }; desc=${desc%  \[*}; desc=${desc% ✓}
+case "$choice" in
+    *"saída ("*)      wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle ;;
+    *microfone)       wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle ;;
+    *"Saída: "*)      pactl set-default-sink "$name"   && notify "Saída: $desc" ;;
+    *"Entrada: "*)    pactl set-default-source "$name" && notify "Entrada: $desc" ;;
+esac

@@ -41,7 +41,7 @@
         "format-muted": "󰖁",
         "format-icons": { "headphone": "󰋋", "default": ["󰕿", "󰖀", "󰕾"] },
         "tooltip-format": "Volume {volume}%",
-        "on-click": "pavucontrol",
+        "on-click": "~/.local/bin/audio",
         "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
         "scroll-step": 5
     },
