@@ -1,12 +1,9 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-[](red)\
+[](red)\
 $os\
-[](bg:lavender fg:red)\
-$time\
-[ ](fg:lavender)\
-$cmd_duration\
+[ ](fg:red)\
 $line_break\
 $character"""
 
@@ -15,6 +12,7 @@ palette = 'cyberdream'
 [os]
 disabled = false
 style = "bg:red fg:crust"
+format = "[ $symbol]($style)"
 
 [os.symbols]
 Windows = " "
@@ -144,6 +142,22 @@ time_format = "%R"
 style = "bg:lavender"
 format = '[[  $time ](fg:crust bg:lavender)]($style)'
 
+[battery]
+full_symbol = "󰁹 "
+charging_symbol = "󰂄 "
+discharging_symbol = "󰁾 "
+unknown_symbol = "󰂑 "
+empty_symbol = "󰂎 "
+format = '[$symbol$percentage ]($style)'
+
+[[battery.display]]
+threshold = 20
+style = "bold fg:crust bg:lavender"
+
+[[battery.display]]
+threshold = 100
+style = "fg:crust bg:lavender"
+
 [line_break]
 disabled = true
 
@@ -157,7 +171,7 @@ vimcmd_replace_symbol = '[❮](bold fg:lavender)'
 vimcmd_visual_symbol = '[❮](bold fg:yellow)'
 
 [cmd_duration]
-show_milliseconds = true
+show_milliseconds = false
 format = " in $duration "
 style = "bg:lavender"
 disabled = false
